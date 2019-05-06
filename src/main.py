@@ -1,10 +1,10 @@
 import json
-from src.automatas.dfa import DeterministicFiniteAutomata
+from src.automatas.ndfa import EpsilonNondeterministicFiniteAutomata
 
-with open('./config/dfa.json') as json_file:
+with open('./config/ndfa.json') as json_file:
     data = json.load(json_file)
 
-    dfa = DeterministicFiniteAutomata(data['alphabet'],
+    dfa = EpsilonNondeterministicFiniteAutomata(data['alphabet'],
                                       data['states'],
                                       data['initialState'],
                                       data['finalStates'],
