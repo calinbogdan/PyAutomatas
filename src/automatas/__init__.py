@@ -1,1 +1,2 @@
 from .dfa import DeterministicFiniteAutomata
+from .ndfa import EpsilonNondeterministicFiniteAutomata, NondeterministicFiniteAutomata

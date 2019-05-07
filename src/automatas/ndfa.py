@@ -98,6 +98,28 @@ class NondeterministicFiniteAutomata:
             else:
                 return False
 
+    def to_dfa(self):
+        new_states = [self.initial_state]
+        transitions = {}
+
+        while (new_states):
+            state = new_states.pop(0)
+            transitions[state] = []
+            for symbol in self.alphabet:
+                transition_results = next(filter(lambda t: t['symbol'] == symbol, self.transitions[state]))['to']
+                target_state = ",".join([str(tr) for tr in transition_results]) 
+                if target_state not in list(transitions.keys):
+                    new_states + [target_state]
+                transitions[state] + [{ 
+                        "to": target_state,
+                        "symbol": symbol
+                    }]
+                
+            
+
+        
+
+        
 
 
 
