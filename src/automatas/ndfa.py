@@ -15,8 +15,10 @@ class EpsilonNondeterministicFiniteAutomata:
         if not all(char in self.alphabet for char in word_chars):
             return False
 
-        nfa_transitions = {}
+        return self.to_nfa().accepts(word)
 
+    def to_nfa(self):
+        nfa_transitions = {}
         for state in self.states:
             transitions = []
 
@@ -28,14 +30,14 @@ class EpsilonNondeterministicFiniteAutomata:
                 for result in state_closure:
                     results += list(filter(lambda t: t['symbol'] == symbol, self.transitions[result]))
 
-                results = reduce(lambda t1, t2: t1 + t2, list(map(lambda t: t['to'], results)))
+                results = reduce(lambda t1, t2: t1 + t2, list(map(lambda t: t['to'], results)), [])
 
-                results_closures = list(set(reduce(lambda t1, t2: t1 + t2, [self.epsilon_closure(res) for res in results])))
+                results_closures = list(
+                    set(reduce(lambda t1, t2: t1 + t2, [self.epsilon_closure(res) for res in results], [])))
 
                 transitions += [{"to": results_closures, "symbol": symbol}]
 
             nfa_transitions[state] = transitions
-
         # find all the states that can get to a final state with epsilon
         final_states = []
         for state in self.states:
@@ -43,10 +45,9 @@ class EpsilonNondeterministicFiniteAutomata:
             for final_state in self.final_states:
                 if final_state in closure:
                     final_states += state
-
         nfa = NondeterministicFiniteAutomata(self.alphabet, self.states, self.initial_state, final_states,
                                              nfa_transitions)
-        return nfa.accepts(word)
+        return nfa
 
     def epsilon_closure(self, state, states=None):
         if states is None:
@@ -102,27 +103,22 @@ class NondeterministicFiniteAutomata:
         new_states = [self.initial_state]
         transitions = {}
 
-        while (new_states):
+        while new_states:
             state = new_states.pop(0)
+            sub_states = state.split(',')
             transitions[state] = []
             for symbol in self.alphabet:
-                transition_results = next(filter(lambda t: t['symbol'] == symbol, self.transitions[state]))['to']
-                target_state = ",".join([str(tr) for tr in transition_results]) 
-                if target_state not in list(transitions.keys):
-                    new_states + [target_state]
-                transitions[state] + [{ 
-                        "to": target_state,
-                        "symbol": symbol
-                    }]
-                
-            
+                transition_results = []
+                for sub_state in sub_states:
+                    transition_results += next(filter(lambda t: t['symbol'] == symbol, self.transitions[sub_state]))['to']
 
-        
+                transition_results = list(set(transition_results))
+                target_state = ",".join([str(tr) for tr in transition_results])
+                transitions[state].append({
+                    "to": target_state,
+                    "symbol": symbol
+                })
+                if target_state not in list(transitions.keys()) + new_states:
+                    new_states += new_states + [target_state]
 
-        
-
-
-
-
-
-
+        print(transitions)

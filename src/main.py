@@ -9,5 +9,5 @@ with open('./config/ndfa.json') as json_file:
                                       data['initialState'],
                                       data['finalStates'],
                                       data['transitions'])
-
+    print(dfa.to_nfa().to_dfa())
     print(dfa.accepts('00'))
