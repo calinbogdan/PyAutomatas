@@ -110,7 +110,8 @@ class NondeterministicFiniteAutomata:
             for symbol in self.alphabet:
                 transition_results = []
                 for sub_state in sub_states:
-                    transition_results += next(filter(lambda t: t['symbol'] == symbol, self.transitions[sub_state]))['to']
+                    transitions = list(self.transitions_for(sub_state, symbol))
+                    transition_results += next(transitions)['to'] if transitions else []
 
                 transition_results = list(set(transition_results))
                 target_state = ",".join([str(tr) for tr in transition_results])
@@ -122,3 +123,8 @@ class NondeterministicFiniteAutomata:
                     new_states += new_states + [target_state]
 
         print(transitions)
+
+    def transitions_for(self, state, symbol):
+        if state in list(self.transitions.keys()):
+            return list(filter(lambda t: t['symbol'] == symbol, self.transitions[state]))
+        return []
